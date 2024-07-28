@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <script src="js/flexible.js"></script>
+  <script src="js/echarts.js"></script>
+  <script src="http://libs.baidu.com/jquery/2.1.4/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>
+  <script src="js/axios.min.js" type="text/javascript" charset="utf-8"></script>
+  <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css"/>
+  <script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
+  <script src="bootstrap/js/bootstrap.js" type="text/javascript" charset="utf-8"></script>
+  <title>Login Page</title>
+  <style>
+    body {
+      background-color: #f2f2f2;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background-image: url('image/login.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    nav {
+      background-color: #333;
+      padding: 10px 0;
+    }
+
+    nav ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    nav ul li {
+      display: inline;
+    }
+
+    nav ul li a {
+      display: block;
+      color: white;
+      text-align: center;
+      padding: 10px 12px;
+      text-decoration: none;
+      font-size: 18px;
+    }
+
+    nav ul li a:hover {
+      background-color: #a7a7a7;
+    }
+
+    .center-form {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: calc(100vh - 50px); /* 留出导航栏的高度 */
+    }
+
+    .form-container {
+      background-color: rgba(255, 255, 255, 0.7);
+      padding: 50px; /* 调整内边距 */
+      border-radius: 10px;
+      box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+      width:500px; /* 调整宽度 */
+      min-height: 500px; /* 设置最小高度 */
+      max-width: 90%; /* 确保响应式设计 */
+      display: flex; /* 使用 Flexbox 来确保内容居中 */
+      flex-direction: column; /* 使表单项目垂直排列 */
+      justify-content: center; /* 垂直方向居中对齐 */
+      align-items: center; /* 水平方向居中对齐 */
+    }
+
+    .form-horizontal .form-group {
+      margin-bottom: 50px;
+    }
+
+    .form-horizontal .control-label {
+      text-align: left;
+    }
+
+    .form-control {
+      box-shadow: none;
+      width: 100%;
+      font-size: 20px; /* 增加字体大小 */
+      padding: 25px; /* 增加内边距 */
+    }
+
+    .control-label {
+      font-size: 25px; /* 调整标签字体大小 */
+    }
+
+    input[type="password"] {
+      -webkit-text-security: disc;
+      input-security: disc;
+    }
+
+    button[type="button"] {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      font-size: 25px;
+      color: #fff;
+      background-color: #2c3e9b;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <nav class="navbar navbar-default" style="background-color: black;">
+      <ul class="nav nav-tabs">
+		  <li style="float: right;margin-right: 100px;" role="presentation">
+		    <img :src="headerurl" class="img-circle" width="50" height="50">
+		  </li>
+        <li style="margin-left: 60px;" role="presentation"><a href="login_main.html">欢迎进入杭州市天气质量实时发布平台</a></li>
+        <li role="presentation"><a href="register.html">注册</a></li>
+        <li role="presentation" v-if="!islogin"><a href="login.html">登录</a></li>
+        <li role="presentation"><a href="index.html">首页</a></li>
+        <li role="presentation"><a href="时段查询.html">时段查询</a></li>
+		 <li role="presentation"><a href="单日查询.html">单日查询</a></li>
+        <li role="presentation" v-if="islogin"><a>{{username}}</a></li>
+        <li role="presentation" v-if="islogin" ><a @click="logout">退出登录</a></li>
+		 <li role="presentation"><a href="welcome.html">管理员界面</a></li>
+       
+      </ul>
+    </nav>
+
+    <div class="center-form">
+      <div class="form-container">
+        <form class="form-horizontal" role="form">
+          <div class="form-group">
+            <label for="firstname" class="col-sm-4 control-label">用户名</label>
+            <div class="col-sm-8">
+              <input type="text" v-model="userName" class="form-control" id="firstname1" placeholder="请输入用户名">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="firstname" class="col-sm-4 control-label">密码</label>
+            <div class="col-sm-8">
+              <input type="password" v-model="password" class="form-control" id="firstname2" placeholder="请输入密码">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="firstname" class="col-sm-6 control-label"> </label>
+            <div class="col-sm-3">
+              <button @click="login" type="button" class="btn btn-default">登录</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <script type="text/javascript">
+        new Vue({
+          el: "#app",
+          data: {
+            headerurl: "http://127.0.0.1/1.jpg",
+            userName: "",
+            password: "",
+            islogin: false,
+            username: ""
+          },
+          methods: {
+            login() {
+              let param = new FormData();
+              param.append("username", this.userName);
+              param.append("password", this.password);
+              axios.post("http://127.0.0.1/login", param)
+                .then(response => {
+                  let resultTo = response.data;
+                  let msg = resultTo.msg;
+                  if (msg === '登录成功') {
+                    let userName = resultTo.value.user_username;
+                    sessionStorage.setItem("username", userName);
+                    this.username = userName;
+                    this.islogin = true;
+                    // 判断是否是管理员
+                    if (userName === 'admin') {
+                      window.location.href = "./welcome.html";
+                    } else {
+                      window.location.href = "./index.html";
+                    }
+                  } else if (msg === '登录失败') {
+                    alert("登录失败");
+                  }
+                })
+                .catch(error => {
+                  console.error("Error during login:", error);
+                  alert("请求错误，请检查控制台");
+                });
+            },
+            logout() {
+              sessionStorage.removeItem("username");
+              this.username = "";
+              this.islogin = false;
+              window.location.href = "./login.html";
+            }
+          },
+          created() {
+            // 检查 sessionStorage 中是否有用户名以决定初始登录状态
+            this.islogin = !!sessionStorage.getItem("username");
+            this.username = sessionStorage.getItem("username") || "";
+          }
+        });
+      </script>
+    </div>
+  </div>
+</body>
+
+</html>

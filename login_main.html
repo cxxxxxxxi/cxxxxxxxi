@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>空气质量指数检测系统登录页面</title>
+    <script src="js/jquery-2.1.1.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="js/owl.carousel.min.js"></script>
+    <script src="js/custom.js"></script>
+    <script src="http://libs.baidu.com/jquery/2.1.4/jquery.min.js"></script>
+  
+    <style>
+        .my-paragraph1 {
+            font-size: 30px;
+            font-family: "华光行楷_CNKI";
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column; /* 垂直排列 */
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .button-container button {
+            padding: 20px 40px; /* 增大按钮内边距 */
+            font-size: 2rem; /* 增大字体 */
+            font-weight: 700;
+            border-radius: 40px;
+            cursor: pointer;
+            border: none;
+            color: #fff;
+            background-color: #3c77d7;
+            width: 500px; /* 设置按钮宽度 */
+            margin: 20px 0; /* 增大按钮上下间距 */
+        }
+
+        .button-container button:hover {
+            background-color: #EEA23A;
+            color: #fff;
+            transform: scale(1.05);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-image: url('image/login.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #chart-container {
+            width: 100%;
+            height: 200px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 图表容器 -->
+    <div id="chart-container"></div>
+
+    <!-- 按钮容器 -->
+    <div class="button-container">
+        <button onclick="location.href='login.html'">登录使用更多功能</button>
+        <button onclick="location.href='register.html'">新用户注册</button>
+    </div>
+
+    <!-- ECharts Script -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+    <script type="text/javascript">
+        var dom = document.getElementById('chart-container');
+        var myChart = echarts.init(dom, null, {
+            renderer: 'canvas',
+            useDirtyRect: false
+        });
+        var app = {};
+
+        var option;
+
+        option = {
+            graphic: {
+                elements: [
+                    {
+                        type: 'text',
+                        left: 'center',
+                        top: '20%', // 调整此值以向上移动文本
+                        style: {
+                            text: '欢迎使用杭州市空气质量实时发布平台',
+                            fontSize: 95,
+                            fontWeight: 'bold',
+                            lineDash: [0, 200],
+                            lineDashOffset: 0,
+                            fill: 'transparent',
+                            stroke: '#000',
+                            lineWidth: 1
+                        },
+                        keyframeAnimation: {
+                            duration: 3000,
+                            loop: true,
+                            keyframes: [
+                                {
+                                    percent: 0.7,
+                                    style: {
+                                        fill: 'transparent',
+                                        lineDashOffset: 200,
+                                        lineDash: [200, 0]
+                                    }
+                                },
+                                {
+                                    percent: 0.8,
+                                    style: {
+                                        fill: 'transparent'
+                                    }
+                                },
+                                {
+                                    percent: 1,
+                                    style: {
+                                        fill: 'black'
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        };
+
+        if (option && typeof option === 'object') {
+            myChart.setOption(option);
+        }
+
+        window.addEventListener('resize', myChart.resize);
+    </script>
+</body>
+
+</html>

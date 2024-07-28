@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="js/flexible.js"></script>
+	<script src="js/echarts.js"></script>
+	<script src="http://libs.baidu.com/jquery/2.1.4/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/echarts-gl/dist/echarts-gl.min.js"></script>
+	<!-- <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css"/> -->
+	 <script src="http://libs.baidu.com/jquery/2.1.4/jquery.min.js"></script>
+	  <script src="js/vue.js"type="text/javascript" charset="utf-8"></script>
+	  <script src="bootstrap/js/bootstrap.js" type="text/javascript" charset="utf-8"></script>
+	 <script src="js/axios.min.js" type="text/javascript" charset="utf-8"></script>
+    <title>数据可视化</title>
+    <link rel="stylesheet" href="index.css">
+    <style>
+        .chart {
+            width: 100%;
+            height: 400px;
+        }
+		/* 导航栏样式 */
+		nav {
+		  background-color: #333;
+		  padding: 10px 0; /* 设置导航栏上下的内边距 */
+		}
+		
+		nav ul {
+		  list-style-type: none;
+		  margin: 0;
+		  padding: 0;
+		  display: flex;
+		  justify-content: flex-start; /* 将导航项靠左对齐 */
+		}
+		
+		nav ul li {
+		  display: inline;
+		}
+		
+		nav ul li a {
+		  display: block;
+		  color: white;
+		  text-align: center;
+		  padding: 10px 12px; /* 减少左右内边距以减小链接之间的距离 */
+		  text-decoration: none;
+		  font-size: 18px; /* 设置字体大小 */
+		}
+		
+		nav ul li a:hover {
+		  background-color: #a7a7a7;
+		}
+		   <style>
+		        body, html {
+		            margin: 0;
+		            padding: 0;
+		            overflow-x: hidden;
+					background-color: #002c7f;
+		        }
+		        .chart {
+		            width: 100%;
+		            height: 400px;
+		        }
+		        /* 导航栏样式 */
+		        nav {
+		            background-color: #333;
+		            padding: 10px 0; /* 设置导航栏上下的内边距 */
+		        }
+		        nav ul {
+		            list-style-type: none;
+		            margin: 0;
+		            padding: 0;
+		            display: flex;
+		            justify-content: flex-start; /* 将导航项靠左对齐 */
+		        }
+		        nav ul li {
+		            display: inline;
+		        }
+		        nav ul li a {
+		            display: block;
+		            color: white;
+		            text-align: center;
+		            padding: 10px 12px; /* 减少左右内边距以减小链接之间的距离 */
+		            text-decoration: none;
+		            font-size: 18px; /* 设置字体大小 */
+		        }
+		        nav ul li a:hover {
+		            background-color: #a7a7a7;
+		        }
+		        .mainbox {
+		            display: flex;
+		            flex-direction: row;
+		            justify-content: space-around;
+		            align-items: flex-start;
+		           margin-top: 30px; /* 增加上方的空隙 */
+		        }
+		        .column {
+		            display: flex;
+		            flex-direction: column;
+		            gap: 20px; /* 增加盒子之间的空隙 */
+				   
+				   
+		        }
+		        .panel {
+		           background-color: #1e1e1e;
+		          padding: 20px;
+		            border-radius: 8px;
+		            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+		        }
+		        .panel h2 {
+		            color: #a7a7a7;
+		        }
+		        .panel-footer {
+		            height: 10px;
+		           /* background-color: #333;*/
+		            border-radius: 0 0 8px 8px;
+		        }
+		    </style>
+    </style>
+	
+</head>
+<body>
+	
+    <!-- 头部 -->
+    <header>
+		 <div id="app">
+		 	<nav class="navbar navbar-default" style="background-color: black;">
+		 	  <ul class="nav nav-tabs">
+				  <li style="float: right;margin-right: 100px;" role="presentation">
+				    <img :src="headerurl" class="img-circle" width="50" height="50">
+				  </li>
+		 	    <li style="margin-left: 60px;" role="presentation"><a href="login_main.html">欢迎进入杭州市天气质量实时发布平台</a></li>
+		 	    <li role="presentation"><a href="register.html">注册</a></li>
+		 	    <li role="presentation" v-if="!islogin"><a href="login.html">登录</a></li>
+		 	    <li role="presentation"><a href="index.html">首页</a></li>
+		 	    <li role="presentation"><a href="时段查询.html">时段查询</a></li>
+		 		 <li role="presentation"><a href="单日查询.html">单日查询</a></li>
+		 	    <li role="presentation" v-if="islogin"><a>{{username}}</a></li>
+		 	    <li role="presentation" v-if="islogin" ><a @click="logout">退出登录</a></li>
+		 		 <li role="presentation"><a href="welcome.html">管理员界面</a></li>
+		 	   
+		 	  </ul>
+		 	</nav>
+		<h1 style="margin-top: -20px;">杭州空气质量实时发布平台</h1>
+        <div class="show-time"></div>
+        <script>
+            var t = null;
+            t = setTimeout(time, 1000); //开始运行
+            function time() {
+                clearTimeout(t); //清除定时器
+                dt = new Date();
+                var y = dt.getFullYear();
+                var mt = dt.getMonth() + 1;
+                var day = dt.getDate();
+                var h = dt.getHours(); //获取时
+                var m = dt.getMinutes(); //获取分
+                var s = dt.getSeconds(); //获取秒
+                document.querySelector(".show-time").innerHTML =
+                    "当前时间：" +
+                    y +
+                    "年" +
+                    mt +
+                    "月" +
+                    day +
+                    "日-" +
+                    h +
+                    "时" +
+                    m +
+                    "分" +
+                    s +
+                    "秒";
+                t = setTimeout(time, 1000); //设定定时器，循环运行
+            }
+        </script>
+    </header>
+
+    <!-- 页面主体 -->
+    <section class="mainbox">
+        <!-- 左侧盒子 -->
+        <div class="column">
+			<div class="panel pie">
+				 <!-- <button class="button" onclick="location.href='../parent-directory/other-page.html';">查看详情</button> -->
+			    <h2>污染物组成</h2>
+			    <div id="pie-chart" class="chart"></div>
+			    <div class="panel-footer"></div>
+			</div>
+            <div class="panel bar">
+            <!-- <button class="button" onclick="location.href='../parent-directory/other-page.html';">查看详情</button> -->
+                 <h2>各指标数据</h2>
+				<!-- 图表放置盒子 -->
+                <div id="bar-chart" class="chart"></div>
+                <!-- 伪元素绘制盒子下边角 -->
+                <div class="panel-footer"></div>
+            </div>
+            <div class="panel line">
+                  <!-- <button class="button" onclick="location.href='../parent-directory/other-page.html';">查看详情</button> -->
+                    <h2>站点具体数据</h2>
+                <div id="line-chart" class="chart"></div>
+                <div class="panel-footer"></div>
+            </div>
+           
+        </div>
+        <!-- 中间盒子 -->
+        <div class="column">
+            <!-- 头部 no模块 -->
+            <div class="no">
+                <div class="no-hd">
+                    <ul>
+                        <li>1252.2</li>
+                        <li>16850</li>
+                    </ul>
+                </div>
+                <div class="no-bd">
+                    <ul>
+                        <li>杭州市总人口数/万人</li>
+                        <li>杭州市占地面积/平方千米</li>
+                    </ul>
+                </div>
+            </div>
+            <!-- map模块 -->
+            <div class="map">
+                <div class="map1"></div>
+                <div class="map2"></div>
+                <div class="map3"></div>
+                <div id="map-chart" class="chart"></div>
+            </div>
+        </div>
+    </section>
+   <script type="text/javascript">
+   		new Vue({
+   			el:"#app",
+   			data:{
+   				headerurl:"http://127.0.0.1/1.jpg",
+   			    islogin:false,
+   				username:null
+   			},
+   			mounted() {
+   				this.init()
+   			},
+   			methods:{
+   				init(){
+   					let userName = sessionStorage.getItem("username")
+   					if(userName!=null){
+   						this.islogin = true
+   						this.username = userName
+   						this.headerurl = "http://127.0.0.1/"+userName+".jpg"
+   					}
+   				},
+   				logout(){
+   					sessionStorage.removeItem("username")
+   					window.location.href="./index.html"
+   				}
+   			}
+   		})
+   		var pieChart = echarts.init(document.getElementById('pie-chart'));
+   		var pieOption = {
+   		    title: { 
+   		        text: '污染物组成', 
+   		        left: 'center' ,
+   		        textStyle: {
+   		            color: '#a7a7a7',  // 设置标题字体颜色
+   		            fontSize: 24  // 设置标题字体大小
+   		        }
+   		    },
+   		    tooltip: { 
+   		        trigger: 'item',
+   		        formatter: '{a} <br/>{b} : {c} ({d}%)'  // 增加格式化提示框
+   		    },
+   		    legend: {
+   		        orient: 'vertical',
+   		        left: 'left',
+   		        textStyle: {
+   		            color: '#a7a7a7'  // 设置图例字体颜色
+   		        }
+   		    },
+   		    series: [
+   		        {
+   		            name: '污染物组成',
+   		            type: 'pie',
+   		            radius: '50%',
+   		            data: [
+   		                { value: 40, name: 'PM2.5' },
+   		                { value: 30, name: 'SO2' },
+   		                { value: 20, name: 'NO2' },
+   		                { value: 10, name: 'O3' }
+   		            ],
+   		            itemStyle: {
+   		                normal: {
+   		                    shadowBlur: 10,
+   		                    shadowOffsetX: 0,
+   		                    shadowColor: 'rgba(0, 0, 0, 0.5)',  // 增加阴影效果
+   		                    borderColor: '#fff',
+   		                    borderWidth: 2  // 增加边框效果
+   		                }
+   		            },
+   		            label: {
+   		                color: '#a7a7a7',  // 设置标签颜色
+   		                fontSize: 14  // 设置标签字体大小
+   		            },
+   		            labelLine: {
+   		                lineStyle: {
+   		                    color: '#a7a7a7'  // 设置标签引导线颜色
+   		                }
+   		            }
+   		        }
+   		    ],
+   		    color: ['#336699', '#99CCFF', '#91c7ae', '#FFCCCC', '#FFFFCC']  // 设置饼图颜色
+   		};
+   		pieChart.setOption(pieOption);
+	  var barChart = echarts.init(document.getElementById('bar-chart'));
+	  var barOption = {
+	      title: { 
+	          text: '各指标数据',
+	          left: 'center',
+	          textStyle: {
+	              color: '#a7a7a7',  // 设置标题字体颜色
+	              fontSize: 24  // 设置标题字体大小
+	          }
+	      },
+	      tooltip: {
+	          trigger: 'axis',
+	          axisPointer: {
+	              type: 'shadow'
+	          },
+	          formatter: '{b}: {c}'
+	      },
+	      legend: {
+	          data: ['数值'],
+	          bottom: 10,
+	          textStyle: {
+	              color: '#a7a7a7'  // 设置图例字体颜色
+	          }
+	      },
+	      xAxis: {
+	          data: ['PM2.5', 'O3', 'PM10', 'CO', 'NO2', 'PM1', 'SO2'],
+	          axisLine: {
+	              lineStyle: {
+	                  color: '#a7a7a7'  // 设置X轴线颜色
+	              }
+	          },
+	          axisLabel: {
+	              color: '#a7a7a7'  // 设置X轴标签颜色
+	          }
+	      },
+	      yAxis: {
+	          axisLine: {
+	              lineStyle: {
+	                  color: '#a7a7a7'  // 设置Y轴线颜色
+	              }
+	          },
+	          axisLabel: {
+	              color: '#a7a7a7'  // 设置Y轴标签颜色
+	          },
+	          splitLine: {
+	              lineStyle: {
+	                  color: '#333'  // 设置网格线颜色
+	              }
+	          }
+	      },
+	      series: [{
+	          name: '人数',
+	          type: 'bar',
+	          data: [5, 20, 36, 10, 10, 20, 20],
+	          itemStyle: {
+	              normal: {
+	                  color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+	                      { offset: 0, color: '#83bff6' },
+	                      { offset: 0.5, color: '#188df0' },
+	                      { offset: 1, color: '#188df0' }
+	                  ]),
+	                  shadowBlur: 10,
+	                  shadowColor: '#a7a7a7'
+	              }
+	          }
+	      }]
+	  };
+	  barChart.setOption(barOption);
+var lineChart = echarts.init(document.getElementById('line-chart'));
+var lineOption = {
+    title: { 
+        text: '站点数据',
+        left: 'center',
+        textStyle: {
+            color: '#a7a7a7',  // 设置标题字体颜色
+            fontSize: 24  // 设置标题字体大小
+        }
+    },
+    tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+            type: 'line',
+            lineStyle: {
+                color: '#a7a7a7'
+            }
+        },
+        formatter: '{b}: {c}'
+    },
+    legend: {
+        data: ['AQI'],
+        bottom: 10,
+        textStyle: {
+            color: '#a7a7a7'  // 设置图例字体颜色
+        },
+    },
+    xAxis: {
+        data: ['1月', '2月', '3月', '4月', '5月'],
+        axisLine: {
+            lineStyle: {
+                color: '#a7a7a7'  // 设置X轴线颜色
+            }
+        },
+        axisLabel: {
+            color: '#a7a7a7'  // 设置X轴标签颜色
+        }
+    },
+    yAxis: {
+        axisLine: {
+            lineStyle: {
+                color: '#a7a7a7'  // 设置Y轴线颜色
+            }
+        },
+        axisLabel: {
+            color: '#a7a7a7'  // 设置Y轴标签颜色
+        },
+        splitLine: {
+            lineStyle: {
+                color: '#333'  // 设置网格线颜色
+            }
+        }
+    },
+    series: [{
+        name: 'AQI',
+        type: 'line',
+        data: [5, 20, 36, 10, 10],
+        smooth: true,  // 设置平滑曲线
+        itemStyle: {
+            normal: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    { offset: 0, color: '#d3d3d3' },
+                    { offset: 0.5, color: '#a9a9a9' },
+                    { offset: 1, color: '#808080' }
+                ]),
+                shadowBlur: 10,
+                shadowColor: 'rgba(0, 0, 0, 0.5)'
+            }
+        },
+        lineStyle: {
+            width: 3,  // 设置线条宽度
+            color: '#FFCCCC'  // 设置线条颜色为浅灰色
+        },
+        symbolSize: 8,  // 设置标记点的大小
+        symbol: 'circle',  // 设置标记点的形状
+        label: {
+            show: true,
+            position: 'top',
+            textStyle: {
+                color: '#a7a7a7'
+            }
+        }
+    }]
+};
+lineChart.setOption(lineOption);
+
+   	    // 初始化地图
+   	    var mapChart = echarts.init(document.getElementById('map-chart'));
+   	
+   	    // 加载杭州的 GeoJSON 数据并注册地图
+   	    $.getJSON('https://geo.datav.aliyun.com/areas_v3/bound/330100_full.json', function(geoJson) {
+   	        echarts.registerMap('Hangzhou', geoJson);
+   	
+   	        var mapOption = {
+   	            title: { text: '杭州市地图', left: 'center' },
+   	            tooltip: { trigger: 'item' },
+   	            series: [
+   	                {
+   	                    name: '杭州市',
+   	                    type: 'map',
+   	                    map: 'Hangzhou',
+   	                    roam: false, // 是否允许缩放和平移
+   	                    label: {
+   	                        show: true
+   	                    },
+   	                    itemStyle: {
+   	                        normal: {
+   	                            areaColor: '#CCCCFF',
+   	                            borderColor: '#111'
+   	                        },
+   	                        emphasis: {
+   	                            areaColor: '#FFCC99'
+   	                        }
+   	                    },
+   	                    data: [
+   	                        { name: '西湖区', value: 100 },
+   	                        { name: '上城区', value: 80 },
+   	                        { name: '下城区', value: 60 },
+   	                        { name: '江干区', value: 40 },
+   	                        { name: '拱墅区', value: 20 }
+   	                    ]
+   	                }
+   	            ]
+   	        };
+   	        mapChart.setOption(mapOption);
+   	    });
+   </script>
+    
+</body>
+</html>
